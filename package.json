@@ -14,8 +14,10 @@
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",
+    "@nestjs/config": "nestjs/config",
     "@nestjs/core": "^11.0.1",
     "@nestjs/jwt": "nestjs/jwt",
+    "@nestjs/mapped-types": "*",
     "@nestjs/platform-express": "^11.0.1",
     "@prisma/client": "^6.9.0",
     "@types/bcrypt": "^5.0.2",
