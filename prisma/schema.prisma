@@ -36,6 +36,7 @@ model User {
   email           String?  @unique
   username        String?  @unique
   phoneNumber     String   @unique @map("phone_number")
+  password        String   
   firstName       String   @map("first_name")
   lastName        String   @map("last_name")
   avatar          String?

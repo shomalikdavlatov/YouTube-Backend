@@ -9,8 +9,15 @@ export default class TransformInterceptor implements NestInterceptor {
     next: CallHandler<any>,
   ): Observable<any> | Promise<Observable<any>> {
     const response = context.switchToHttp().getResponse();
-    const handler = context.getHandler();
-    if (this.reflector.get('isFreeResponse', handler)) return next.handle();
+    const handlerFunction = context.getHandler();
+    const handlerClass = context.getClass();
+    if (
+      this.reflector.getAllAndOverride('isFreeResponse', [
+        handlerClass,
+        handlerFunction,
+      ])
+    )
+      return next.handle();
     return next.handle().pipe(
       // @ts-ignore
       map((data: any) => {

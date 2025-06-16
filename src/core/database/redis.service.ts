@@ -1,6 +1,7 @@
-import { Logger } from "@nestjs/common";
+import { Injectable, Logger } from "@nestjs/common";
 import Redis from "ioredis";
 
+@Injectable()
 export default class RedisService {
     private readonly logger: Logger = new Logger("Redis");
     private redis: Redis;
