@@ -6,10 +6,17 @@ import { SubscriptionsModule } from './modules/subscriptions/subscriptions.modul
 import { CommentsModule } from './modules/comments/comments.module';
 import { PlaylistsModule } from './modules/playlists/playlists.module';
 import { UsersModule } from './modules/users/users.module';
+import CoreModule from './core/core.module';
+import { APP_INTERCEPTOR } from '@nestjs/core';
+import TransformInterceptor from './common/interceptors/transform.interceptor';
+import AuthGuard from './common/guards/auth.guard';
 
 @Module({
-  imports: [VideosModule, AuthModule, ChannelsModule, SubscriptionsModule, CommentsModule, PlaylistsModule, UsersModule],
+  imports: [VideosModule, AuthModule, ChannelsModule, SubscriptionsModule, CommentsModule, PlaylistsModule, UsersModule, CoreModule],
   controllers: [],
-  providers: [],
+  providers: [{
+    provide: APP_INTERCEPTOR,
+    useClass: TransformInterceptor
+  }, AuthGuard],
 })
 export class AppModule {}

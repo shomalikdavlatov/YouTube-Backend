@@ -1,7 +1,8 @@
-import { CallHandler, ExecutionContext, NestInterceptor } from '@nestjs/common';
+import { CallHandler, ExecutionContext, Injectable, NestInterceptor } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
 
+@Injectable()
 export default class TransformInterceptor implements NestInterceptor {
   constructor(private reflector: Reflector) {}
   intercept(
@@ -19,7 +20,6 @@ export default class TransformInterceptor implements NestInterceptor {
     )
       return next.handle();
     return next.handle().pipe(
-      // @ts-ignore
       map((data: any) => {
         return {
           status: response.statusCode,

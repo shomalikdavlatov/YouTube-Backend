@@ -4,8 +4,7 @@ import Redis from "ioredis";
 @Injectable()
 export default class RedisService {
     private readonly logger: Logger = new Logger("Redis");
-    private redis: Redis;
-    private duration: number = 120;
+    public redis: Redis;
     constructor() {
         this.redis = new Redis({
             host: process.env.REDIS_HOST as string,
@@ -19,8 +18,8 @@ export default class RedisService {
             this.redis.quit();
         });
     }
-    async set(key: string, value: string | object) {
-        return await this.redis.setex(key, this.duration, typeof value === "string" ? value : JSON.stringify(value));
+    async set(key: string, duration: number, value: string | object) {
+        return await this.redis.setex(key, duration, typeof value === "string" ? value : JSON.stringify(value));
     }
     async get(key: string) {
         return await this.redis.get(key);
