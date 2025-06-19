@@ -18,15 +18,16 @@ export default class AuthGuard implements CanActivate {
     const handlerClass = context.getClass();
     if (
       this.reflector.getAllAndOverride('isFreeAuth', [
-        handlerClass,
         handlerFunction,
+        handlerClass,
       ])
     )
       return true;
     const request = context.switchToHttp().getRequest();
     const token = request.cookies['jwt'];
     try {
-      request.user = await this.jwtService.verifyAsync(token);
+      const {userId, userRole} = await this.jwtService.verifyAsync(token);
+      request.user = {userId, userRole};
       return true;
     } catch (error) {
       throw new ForbiddenException('Token is invalid!');

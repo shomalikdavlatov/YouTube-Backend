@@ -37,7 +37,7 @@ export default class OtpSecurityService {
     const newKey = `temporary-blocked:${key}`;
     if (await this.redisService.get(newKey))
       throw new BadRequestException({
-        message: `You tried too much, please try again after ${Math.floor(await this.redisService.ttl(newKey))} minutes!`,
+        message: `You tried too much, please try again after ${Math.floor(await this.redisService.ttl(newKey))} seconds!`,
       });
   }
 }

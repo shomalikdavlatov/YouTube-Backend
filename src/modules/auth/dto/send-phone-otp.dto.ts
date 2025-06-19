@@ -1,4 +1,4 @@
-import { Matches } from "class-validator";
+import { Matches } from 'class-validator';
 
 export default class SendPhoneOtpDto {
   @Matches(/^(\+998)?[0-9]{9}$/, {

@@ -1,4 +1,11 @@
-import { IsEmail, IsString, IsStrongPassword, Length, Matches, ValidateIf } from 'class-validator';
+import {
+  IsString,
+  Length,
+  IsStrongPassword,
+  IsEmail,
+  Matches,
+  ValidateIf,
+} from 'class-validator';
 
 export default class LoginDto {
   @ValidateIf((o) => !o.email && !o.phone_number)
@@ -19,4 +26,8 @@ export default class LoginDto {
     message: 'Phone number must be valid Uzbekistan format',
   })
   phone_number?: string;
+
+  @ValidateIf((o) => !!o.phone_number)
+  @IsString()
+  session_token?: string;
 }

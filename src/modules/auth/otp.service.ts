@@ -51,7 +51,11 @@ export default class OtpService {
         await this.redisService.del(key);
         await this.redisService.del(`otp-attempts:${key}`);
         const sessionToken = this.generateSessionToken();
-        await this.redisService.set(`session-token:${key.split(':')[1]}`, 300, sessionToken);
+        await this.redisService.set(
+          `session-token:${key.split(":")[1]}`,
+          300,
+          sessionToken,
+        );
         return sessionToken;
     }
     async checkSessionToken(key: string, token: string) {

@@ -2,6 +2,8 @@ import {
   ConflictException,
   Injectable,
   InternalServerErrorException,
+  NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import SendPhoneOtpDto from './dto/send-phone-otp.dto';
 import VerifyPhoneOtpDto from './dto/verify-phone-otp.dto';
@@ -14,6 +16,9 @@ import PrismaService from 'src/core/database/prisma.service';
 import bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import RedisService from 'src/core/database/redis.service';
+import SendEmailDto from './dto/send-email.dto';
+import VerifyEmailDto from './dto/verify-email.dto';
+import EmailService from './email.service';
 
 @Injectable()
 export class AuthService {
@@ -22,14 +27,10 @@ export class AuthService {
     private prismaService: PrismaService,
     private jwtService: JwtService,
     private redisService: RedisService,
+    private emailService: EmailService
   ) {}
   async sendPhoneOtp(body: SendPhoneOtpDto) {
     const phoneNumber = body.phone_number;
-    const findUser = await this.prismaService.prisma.user.findFirst({
-      where: { phoneNumber },
-    });
-    if (findUser)
-      throw new ConflictException('This phone number is already registered!');
     const response = await this.otpService.sendPhoneOtp(phoneNumber);
     if (!response) throw new InternalServerErrorException('Server error!');
     return {
@@ -47,9 +48,21 @@ export class AuthService {
       session_token: sessionToken,
     };
   }
-  async sendEmailOtp(body: SendEmailOtpDto) {}
+  async sendEmailOtp(body: SendEmailOtpDto) {
+    
+  }
   async verifyEmailOtp(body: VerifyEmailOtpDto) {}
+  async sendEmail(body: SendEmailDto) {
+    await this.emailService.sendEmailUrl(body.email);
+    return {message: `Email has been sent to ${body.email} successfully!`};
+  }
+  async verifyEmail(query: VerifyEmailDto, userId: string) {
+    const email = await this.emailService.verifySessionToken(query.token);
+    await this.prismaService.prisma.user.update({where: {id: userId}, data: {email}});
+    return {message: "Email has been verificated successfully!"};
+  }
   async register(body: RegisterDto) {
+    let token: string;
     if (
       await this.prismaService.prisma.user.findFirst({
         where: { phoneNumber: body.phone_number },
@@ -68,6 +81,7 @@ export class AuthService {
       body.password,
       +(process.env.HASH as string),
     );
+    await this.redisService.del(key);
     const user = await this.prismaService.prisma.user.create({
       data: {
         username: body.username,
@@ -77,12 +91,44 @@ export class AuthService {
         lastName: body.last_name,
       },
     });
-    const token = await this.jwtService.signAsync({
+    token = await this.jwtService.signAsync({
       userId: user.id,
-      userRole: user.role,
+      userRole: user.role
     });
-    await this.redisService.del(key);
-    return token;
+    return { token, message: 'Registered successfully!' };
   }
-  async login(body: LoginDto) {}
+  async login(body: LoginDto) {
+    let token: string;
+    if (body.username) {
+      const user = await this.prismaService.prisma.user.findFirst({
+        where: { username: body.username },
+      });
+      if (
+        !user ||
+        (await bcrypt.compare(body.password as string, user.password))
+      )
+        throw new UnauthorizedException('Username or password is incorrect!');
+      token = await this.jwtService.signAsync({
+        userId: user.id,
+        userRole: user.role,
+      });
+    }
+    if (body.phone_number) {
+      const user = await this.prismaService.prisma.user.findFirst({
+        where: { phoneNumber: body.phone_number },
+      });
+      if (!user)
+        throw new NotFoundException(
+          'User with specified phone number not found!',
+        );
+      const key = `session-token:${body.phone_number}`;
+      await this.otpService.checkSessionToken(
+        key,
+        body.session_token as string,
+      );
+      await this.redisService.del(key);
+      token = await this.jwtService.signAsync({ userId: user.id, userRole: user.role });
+    }
+    return { token: token!, message: 'Logged in successfully!' };
+  }
 }

@@ -14,8 +14,8 @@ export default class TransformInterceptor implements NestInterceptor {
     const handlerClass = context.getClass();
     if (
       this.reflector.getAllAndOverride('isFreeResponse', [
-        handlerClass,
         handlerFunction,
+        handlerClass,
       ])
     )
       return next.handle();

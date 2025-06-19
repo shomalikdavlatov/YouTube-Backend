@@ -31,6 +31,7 @@
     "cookie-parser": "^1.4.7",
     "ioredis": "^5.6.1",
     "multer": "^2.0.1",
+    "nestjs-resend": "^1.0.1",
     "otp-generator": "^4.0.1",
     "prisma": "^6.9.0",
     "redis": "^5.5.6",
