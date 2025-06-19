@@ -32,42 +32,42 @@ enum Visibility {
 }
 
 model User {
-  id              String   @id @default(uuid())
+  id              String   @id              @default(uuid())
   email           String?  @unique
-  username        String   @db.VarChar(50) @unique
-  phoneNumber     String   @unique @map("phone_number")
+  username        String   @db.VarChar(50)  @unique
+  phoneNumber     String   @unique          @map("phone_number")
   password        String   
-  firstName       String   @db.VarChar(50) @map("first_name")
-  lastName        String   @db.VarChar(50) @map("last_name")
-  avatar          String?
+  firstName       String   @db.VarChar(50)  @map("first_name")
+  lastName        String   @db.VarChar(50)  @map("last_name")
+  channelBanner   String?  @map("channel_banner")
+  channelDescription       String?          @map("channel_description")
+  videosCount     Int      @default(0)      @map("videos_count")
+  subscribersCount         Int              @default(0)        @map("subscribers_count")
+  totalViews      Int      @default(0)      @map("total_views")
   role            Role     @default(USER)
-  createdAt       DateTime @default(now()) @map("created_at")
-  updatedAt       DateTime @updatedAt @map("updated_at")
+  createdAt       DateTime @default(now())  @map("created_at")
+  updatedAt       DateTime @updatedAt       @map("updated_at")
 
   // Relations
   videos          Video[]
   comments        Comment[]
   likes           Like[]
-  subscriptions   Subscription[] @relation("UserSubscriptions")
-  subscribers     Subscription[] @relation("UserSubscribers")
+  subscriptions   Subscription[]           @relation("UserSubscriptions")
+  subscribers     Subscription[]           @relation("UserSubscribers")
   playlists       Playlist[]
 
   @@map("users")
 }
 
 // KEYINROQ QO'SHISH MUMKIN BO'LGAN QISMLAR:
-// - channelBanner String?
-// - channelDescription String?
 // - isBlocked Boolean @default(false)
 // - blockedUntil DateTime?
 // - loginAttempts Int @default(0)
-// - subscribersCount Int @default(0)
-// - totalViews BigInt @default(0)
 // - watchHistory WatchHistory[]
 // - notifications Notification[]
 
 model Video {
-  id              String      @id @default(uuid())
+  id              String      @id             @default(uuid())
   title           String
   description     String?
   thumbnail       String?
@@ -75,9 +75,9 @@ model Video {
   duration        Int         // seconds
   status          VideoStatus @default(PROCESSING)
   visibility      Visibility  @default(PUBLIC)
-  viewsCount      BigInt      @default(0) @map("views_count")
-  likesCount      Int         @default(0) @map("likes_count")
-  dislikesCount   Int         @default(0) @map("dislikes_count")
+  viewsCount      Int         @default(0)     @map("views_count")
+  likesCount      Int         @default(0)     @map("likes_count")
+  dislikesCount   Int         @default(0)     @map("dislikes_count")
   createdAt       DateTime    @default(now()) @map("created_at")
 
   // Relations
@@ -101,10 +101,10 @@ model Video {
 // - playlistVideos PlaylistVideo[]
 
 model Comment {
-  id            String   @id @default(uuid())
+  id            String   @id              @default(uuid())
   content       String
-  likesCount    Int      @default(0) @map("likes_count")
-  createdAt     DateTime @default(now()) @map("created_at")
+  likesCount    Int      @default(0)      @map("likes_count")
+  createdAt     DateTime @default(now())  @map("created_at")
 
   // Relations
   authorId      String   @map("author_id")
@@ -125,9 +125,9 @@ model Comment {
 // - replies Comment[] @relation("CommentReplies")
 
 model Subscription {
-  id            String   @id @default(uuid())
-  notificationsEnabled Boolean @default(false) @map("notifications_enabled")
-  createdAt     DateTime @default(now()) @map("created_at")
+  id            String   @id              @default(uuid())
+  notificationsEnabled   Boolean          @default(false)     @map("notifications_enabled")
+  createdAt     DateTime @default(now())  @map("created_at")
 
   // Relations
   subscriberId  String   @map("subscriber_id")
@@ -140,12 +140,12 @@ model Subscription {
 }
 
 model Playlist {
-  id            String   @id @default(uuid())
+  id            String   @id              @default(uuid())
   title         String
   description   String?
   playlistUrl   String   @map("playlist_url")
-  visibility    Visibility @default(PUBLIC)
-  createdAt     DateTime @default(now()) @map("created_at")
+  visibility    Visibility                @default(PUBLIC)
+  createdAt     DateTime @default(now())  @map("created_at")
 
   // Relations
   authorId      String   @map("author_id")
@@ -156,9 +156,9 @@ model Playlist {
 }
 
 model PlaylistVideo {
-  id          String   @id @default(cuid())
+  id          String   @id              @default(cuid())
   position    Int
-  addedAt     DateTime @default(now()) @map("added_at")
+  addedAt     DateTime @default(now())  @map("added_at")
 
   playlistId  String   @map("playlist_id")
   playlist    Playlist @relation(fields: [playlistId], references: [id], onDelete: Cascade)
@@ -170,9 +170,9 @@ model PlaylistVideo {
 }
 
 model Like {
-  id        String   @id @default(uuid())
+  id        String   @id              @default(uuid())
   type      LikeType
-  createdAt DateTime @default(now()) @map("created_at")
+  createdAt DateTime @default(now())  @map("created_at")
 
   userId    String   @map("user_id")
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)

@@ -9,8 +9,8 @@ export default class RoleGuard implements CanActivate {
         const request = context.switchToHttp().getRequest();
         const handler = context.getHandler();
         const roles = this.reflector.get('roles', handler);
-        if (roles.include(request.user.userRole)) return true;
-        if (roles.include('OWNER') && request.params.id === request.user.userId) return true;
+        if (roles.includes(request.user.userRole)) return true;
+        if (roles.includes('OWNER') && request.params.id === request.user.userId) return true;
         throw new ForbiddenException("You do not have credentials!");
     }
 }

@@ -105,7 +105,7 @@ export class AuthService {
       });
       if (
         !user ||
-        (await bcrypt.compare(body.password as string, user.password))
+        !(await bcrypt.compare(body.password as string, user.password))
       )
         throw new UnauthorizedException('Username or password is incorrect!');
       token = await this.jwtService.signAsync({

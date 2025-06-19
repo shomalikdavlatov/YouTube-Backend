@@ -14,7 +14,7 @@ export default class LoginDto {
   username?: string;
 
   @ValidateIf((o) => !!o.username)
-  @IsStrongPassword()
+  @IsString()
   password?: string;
 
   @ValidateIf((o) => !o.username && !o.phone_number)
