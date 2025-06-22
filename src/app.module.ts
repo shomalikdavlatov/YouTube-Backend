@@ -10,13 +10,30 @@ import CoreModule from './core/core.module';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import TransformInterceptor from './common/interceptors/transform.interceptor';
 import AuthGuard from './common/guards/auth.guard';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 @Module({
-  imports: [VideosModule, AuthModule, ChannelsModule, SubscriptionsModule, CommentsModule, PlaylistsModule, UsersModule, CoreModule],
+  imports: [
+    ServeStaticModule.forRoot({
+      rootPath: join(process.cwd(), 'uploads'),
+    }),
+    VideosModule,
+    AuthModule,
+    ChannelsModule,
+    SubscriptionsModule,
+    CommentsModule,
+    PlaylistsModule,
+    UsersModule,
+    CoreModule,
+  ],
   controllers: [],
-  providers: [{
-    provide: APP_INTERCEPTOR,
-    useClass: TransformInterceptor
-  }, AuthGuard],
+  providers: [
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: TransformInterceptor,
+    },
+    AuthGuard,
+  ],
 })
 export class AppModule {}
